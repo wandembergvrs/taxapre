@@ -2,333 +2,321 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Simulador Selic (cenários) + IR + Pré-fixado equivalente</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Selic (cenários) + IR + Pré-fixado equivalente</title>
   <style>
     :root{
       --bg:#0b0f14; --card:#111827; --muted:#9ca3af; --text:#e5e7eb;
-      --accent:#22c55e; --accent2:#10b981; --warn:#f59e0b;
-      --line:rgba(255,255,255,.08);
+      --accent:#22c55e; --accent2:#10b981; --warn:#f59e0b; --line:rgba(255,255,255,.08);
     }
     *{ box-sizing:border-box; }
     body{
-      margin:0; font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-      background: linear-gradient(180deg, #0b0f14, #0a1220); color: var(--text);
+      margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background:linear-gradient(180deg,#0b0f14,#0a1220); color:var(--text);
     }
     header{ padding:22px 18px 10px; max-width:1160px; margin:0 auto; }
-    h1{ margin:0 0 6px; font-size:20px; font-weight:750; }
+    h1{ margin:0 0 6px; font-size:20px; font-weight:800; }
     p.sub{ margin:0; color:var(--muted); font-size:13px; line-height:1.35; }
     main{
       max-width:1160px; margin:0 auto; padding:12px 18px 26px;
-      display:grid; gap:14px; grid-template-columns: 380px 1fr;
+      display:grid; gap:14px; grid-template-columns:390px 1fr;
     }
     @media (max-width: 1020px){ main{ grid-template-columns:1fr; } }
 
     .card{
-      background: rgba(17,24,39,.92); border: 1px solid rgba(255,255,255,.06);
-      border-radius:16px; padding:14px; box-shadow: 0 12px 30px rgba(0,0,0,.25);
+      background:rgba(17,24,39,.92); border:1px solid rgba(255,255,255,.06);
+      border-radius:16px; padding:14px; box-shadow:0 12px 30px rgba(0,0,0,.25);
     }
     label{ display:block; font-size:12px; color:var(--muted); margin:10px 0 6px; }
-    input, select, textarea, button{
+    input,select,textarea,button{
       width:100%; border-radius:12px; border:1px solid rgba(255,255,255,.10);
-      background: rgba(2,6,23,.55); color:var(--text); padding:10px 10px; outline:none;
+      background:rgba(2,6,23,.55); color:var(--text); padding:10px 10px; outline:none;
     }
-    input:focus, select:focus, textarea:focus{
-      border-color: rgba(34,197,94,.55);
-      box-shadow: 0 0 0 3px rgba(34,197,94,.12);
+    input:focus,select:focus,textarea:focus{
+      border-color:rgba(34,197,94,.55); box-shadow:0 0 0 3px rgba(34,197,94,.12);
     }
     textarea{
-      min-height:120px; resize: vertical;
-      font-family: ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+      min-height:120px; resize:vertical; font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
       font-size:12px; line-height:1.35;
     }
     .row{ display:flex; gap:10px; }
     .row > *{ flex:1; }
-    .grid2{ display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
-    @media (max-width: 1020px){ .grid2{ grid-template-columns: 1fr; } }
+    .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    @media (max-width: 1020px){ .grid2{ grid-template-columns:1fr; } }
 
     .btns{ display:flex; gap:10px; margin-top:12px; }
-    button{ cursor:pointer; font-weight:700; }
+    button{ cursor:pointer; font-weight:800; }
     button.primary{
-      background: linear-gradient(135deg, rgba(34,197,94,.95), rgba(16,185,129,.95));
-      border-color: rgba(34,197,94,.55); color:#08130c;
+      background:linear-gradient(135deg,rgba(34,197,94,.95),rgba(16,185,129,.95));
+      border-color:rgba(34,197,94,.55); color:#08130c;
     }
-    button.ghost{ background: rgba(2,6,23,.25); }
+    button.ghost{ background:rgba(2,6,23,.25); }
 
     .hint{ font-size:12px; color:var(--muted); margin-top:6px; }
     .warn{ color:#ffd38a; }
     .badge{
-      display:inline-flex; align-items:center; gap:8px;
-      padding:6px 10px; border-radius:999px;
-      background: rgba(2,6,23,.35); border:1px solid rgba(255,255,255,.08);
-      color: var(--muted); font-size:12px;
+      display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius:999px;
+      background:rgba(2,6,23,.35); border:1px solid rgba(255,255,255,.08);
+      color:var(--muted); font-size:12px;
     }
 
-    .kpis{ display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:10px; margin-top:12px; }
-    .kpi{
-      padding:12px; border-radius:14px; background: rgba(2,6,23,.35);
-      border:1px solid rgba(255,255,255,.08);
-    }
+    .kpis{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin-top:12px; }
+    .kpi{ padding:12px; border-radius:14px; background:rgba(2,6,23,.35); border:1px solid rgba(255,255,255,.08); }
     .kpi .t{ font-size:12px; color:var(--muted); }
-    .kpi .v{ margin-top:6px; font-size:18px; font-weight:800; letter-spacing:.2px; }
+    .kpi .v{ margin-top:6px; font-size:18px; font-weight:900; letter-spacing:.2px; }
     .kpi .s{ margin-top:4px; font-size:12px; color:var(--muted); }
 
-    canvas{
-      width:100%; height:260px; border-radius:14px;
-      background: rgba(2,6,23,.30); border:1px solid rgba(255,255,255,.06);
+    .hr{ height:1px; background:var(--line); margin:12px 0; border-radius:1px; }
+
+    .chartWrap canvas{
+      width:100%; height:280px; border-radius:14px;
+      background:rgba(2,6,23,.30); border:1px solid rgba(255,255,255,.06);
+      display:block;
     }
-
     footer{ max-width:1160px; margin:0 auto; padding:0 18px 24px; color:var(--muted); font-size:12px; line-height:1.35; }
-    code.inline{ padding:2px 6px; border-radius:8px; background: rgba(2,6,23,.45); border:1px solid rgba(255,255,255,.08); }
-
-    .hr{ height:1px; background: var(--line); margin: 12px 0; border-radius:1px; }
+    code.inline{ padding:2px 6px; border-radius:8px; background:rgba(2,6,23,.45); border:1px solid rgba(255,255,255,.08); }
   </style>
 </head>
+
 <body>
-  <header>
-    <h1>Selic (cenários) + IR + Pré-fixado equivalente</h1>
-    <p class="sub">
-      Simule trajetórias de queda da Selic (linear, exponencial, potência, logística, degraus, custom),
-      calcule retorno <b>bruto e líquido</b> com IR (tabela regressiva / isento),
-      e descubra qual <b>taxa pré-fixada (a.a.)</b> entrega o mesmo rendimento líquido no prazo de <b>12/24/36 meses</b>.
-    </p>
-  </header>
+<header>
+  <h1>Selic (cenários) + IR + Pré-fixado equivalente</h1>
+  <p class="sub">
+    Simule cenários de queda da Selic (linear/exponencial/potência/logística/degraus/custom), aplique IR (regressivo/isento/manual),
+    e encontre o <b>pré-fixado equivalente</b> que entrega o mesmo <b>resultado líquido</b> em 12/24/36 meses.
+  </p>
+</header>
 
-  <main>
-    <!-- CONTROLES -->
-    <section class="card" aria-label="Controles">
-      <div class="row">
-        <div>
-          <label for="prazoPreset">Prazo (meses)</label>
-          <select id="prazoPreset">
-            <option value="12" selected>12 meses</option>
-            <option value="24">24 meses</option>
-            <option value="36">36 meses</option>
-            <option value="custom">Custom</option>
-          </select>
-        </div>
-        <div id="prazoCustomWrap" style="display:none;">
-          <label for="prazoMeses">Meses (custom)</label>
-          <input id="prazoMeses" type="number" min="1" step="1" value="18" />
-        </div>
+<main>
+  <!-- CONTROLES -->
+  <section class="card">
+    <div class="row">
+      <div>
+        <label for="prazoPreset">Prazo (meses)</label>
+        <select id="prazoPreset">
+          <option value="12" selected>12 meses</option>
+          <option value="24">24 meses</option>
+          <option value="36">36 meses</option>
+          <option value="custom">Custom</option>
+        </select>
       </div>
-
-      <div class="row">
-        <div>
-          <label for="unidade">Base de capitalização</label>
-          <select id="unidade">
-            <option value="uteis" selected>Dias úteis (base 252)</option>
-            <option value="corridos">Dias corridos (base 365)</option>
-          </select>
-        </div>
-        <div>
-          <label for="diasIRConv">Convenção de dias p/ IR</label>
-          <select id="diasIRConv">
-            <option value="365" selected>365 dias/ano (calendário)</option>
-            <option value="360">360 dias/ano (30 dias/mês)</option>
-          </select>
-        </div>
+      <div id="prazoCustomWrap" style="display:none;">
+        <label for="prazoMeses">Meses (custom)</label>
+        <input id="prazoMeses" type="number" min="1" step="1" value="18" />
       </div>
+    </div>
 
-      <div class="row">
-        <div>
-          <label for="r0">Selic inicial (a.a.)</label>
-          <input id="r0" type="text" value="15,00%" />
-        </div>
-        <div>
-          <label for="r1">Selic final (a.a.)</label>
-          <input id="r1" type="text" value="11,50%" />
-        </div>
+    <div class="row">
+      <div>
+        <label for="unidade">Capitalização</label>
+        <select id="unidade">
+          <option value="uteis" selected>Dias úteis (base 252)</option>
+          <option value="corridos">Dias corridos (base 365)</option>
+        </select>
       </div>
-
-      <label for="cenario">Cenário de trajetória</label>
-      <select id="cenario">
-        <option value="linear" selected>Queda linear</option>
-        <option value="exponencial">Queda exponencial (suavizada)</option>
-        <option value="potencia">Curva potência (convexa/concava)</option>
-        <option value="logistica">Curva logística (S-curve)</option>
-        <option value="degraus">Degraus (reuniões / intervalos)</option>
-        <option value="custom">Custom (blocos de dias)</option>
-      </select>
-
-      <div class="grid2" style="margin-top:10px;">
-        <div>
-          <label for="curv">Curvatura (exponencial/logística)</label>
-          <input id="curv" type="number" min="0.2" step="0.1" value="2.0" />
-          <div class="hint">Maior = queda mais forte no começo (exponencial) ou mais concentrada no meio (logística).</div>
-        </div>
-        <div>
-          <label for="expo">Expoente (potência)</label>
-          <input id="expo" type="number" min="0.2" step="0.1" value="1.0" />
-          <div class="hint">1 = linear; &gt;1 = queda mais lenta no começo; &lt;1 = mais rápida no começo.</div>
-        </div>
+      <div>
+        <label for="diasIRConv">Convenção de dias p/ IR</label>
+        <select id="diasIRConv">
+          <option value="365" selected>365 dias/ano</option>
+          <option value="360">360 dias/ano</option>
+        </select>
       </div>
+    </div>
 
-      <div class="grid2" style="margin-top:12px;">
-        <div>
-          <label for="stepEvery">Degraus: intervalo (dias)</label>
-          <input id="stepEvery" type="number" min="1" step="1" value="45" />
-        </div>
-        <div>
-          <label for="stepSize">Degraus: tamanho (p.p.)</label>
-          <input id="stepSize" type="number" min="0" step="0.05" value="0.50" />
-          <div class="hint">Se 0, distribui automaticamente de r0 → r1 ao longo dos degraus.</div>
-        </div>
+    <div class="row">
+      <div>
+        <label for="r0">Selic inicial (a.a.)</label>
+        <input id="r0" type="text" value="15,00%" />
       </div>
+      <div>
+        <label for="r1">Selic final (a.a.)</label>
+        <input id="r1" type="text" value="11,50%" />
+      </div>
+    </div>
 
-      <div id="customBox" style="display:none; margin-top:10px;">
-        <label for="customText">Custom: blocos de dias</label>
-        <textarea id="customText" spellcheck="false"># Formato: inicio-fim; taxa
-# Ex.: 1-31; 15%
+    <label for="cenario">Cenário</label>
+    <select id="cenario">
+      <option value="linear" selected>Queda linear</option>
+      <option value="exponencial">Queda exponencial (suavizada)</option>
+      <option value="potencia">Curva potência (convexa/concava)</option>
+      <option value="logistica">Curva logística (S-curve)</option>
+      <option value="degraus">Degraus (Copom)</option>
+      <option value="custom">Custom (blocos)</option>
+    </select>
+
+    <div class="grid2" style="margin-top:10px;">
+      <div>
+        <label for="curv">Curvatura (exp/log)</label>
+        <input id="curv" type="number" min="0.2" step="0.1" value="2.0" />
+        <div class="hint">Maior = queda mais forte no começo (exp) ou mais concentrada no meio (logística).</div>
+      </div>
+      <div>
+        <label for="expo">Expoente (potência)</label>
+        <input id="expo" type="number" min="0.2" step="0.1" value="1.0" />
+        <div class="hint">1 = linear; &gt;1 = mais lento no começo; &lt;1 = mais rápido no começo.</div>
+      </div>
+    </div>
+
+    <div class="grid2" style="margin-top:12px;">
+      <div>
+        <label for="stepEveryCalendar">Degraus: intervalo entre reuniões (dias corridos)</label>
+        <input id="stepEveryCalendar" type="number" min="1" step="1" value="45" />
+        <div class="hint" id="stepEveryHint">≈ 31 dias úteis na base 252</div>
+      </div>
+      <div>
+        <label for="stepSize">Degraus: tamanho (p.p.)</label>
+        <input id="stepSize" type="number" min="0" step="0.05" value="0.50" />
+        <div class="hint">Se 0, distribui automaticamente de r0 → r1 ao longo dos degraus.</div>
+      </div>
+    </div>
+
+    <div id="customBox" style="display:none; margin-top:10px;">
+      <label for="customText">Custom: blocos na base do horizonte (1..N)</label>
+      <textarea id="customText" spellcheck="false"># Formato: inicio-fim; taxa
+# Ex.: 1-63; 15%
 1-63; 15%
 64-126; 14%
 127-189; 13%
 190-252; 11,5%</textarea>
-        <div class="hint">Os índices (1..N) se referem ao número de dias do horizonte na base escolhida.</div>
-      </div>
-
-      <div class="hr"></div>
-
-      <label for="taxRegime">Tributação (IR)</label>
-      <select id="taxRegime">
-        <option value="regressivo" selected>Tributável (tabela regressiva)</option>
-        <option value="isento">Isento (ex.: LCI/LCA)</option>
-        <option value="manual">Alíquota manual</option>
-      </select>
-
-      <div id="aliqManualWrap" style="display:none;">
-        <label for="aliqManual">Alíquota manual</label>
-        <input id="aliqManual" type="text" value="15%" />
-      </div>
-
-      <div class="row">
-        <div>
-          <label for="principal">Valor aplicado (R$)</label>
-          <input id="principal" type="text" value="10000" />
-        </div>
-        <div>
-          <label for="preMarket">Pré-fixado “de mercado” (a.a.)</label>
-          <input id="preMarket" type="text" value="13,00%" />
-          <div class="hint">Opcional: compara esse pré com o cenário Selic (líquido).</div>
-        </div>
-      </div>
-
-      <div class="btns">
-        <button class="primary" id="btnCalc">Calcular</button>
-        <button class="ghost" id="btnShare">Copiar link do cenário</button>
-      </div>
-
-      <div class="hint warn" id="msg"></div>
-    </section>
-
-    <!-- RESULTADOS -->
-    <section class="card" aria-label="Resultados">
-      <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
-        <span class="badge" id="badgeBase">Base: 252 dias úteis</span>
-        <span class="badge" id="badgeHorizonte">Horizonte: 252 dias úteis</span>
-        <span class="badge" id="badgeIR">IR: —</span>
-      </div>
-
-      <div class="kpis">
-        <div class="kpi">
-          <div class="t">Selic (cenário) — Fator bruto</div>
-          <div class="v" id="kFatorBruto">—</div>
-          <div class="s">Acúmulo diário: <code class="inline">r_d(t)=(1+r_a(t))^(1/base)-1</code></div>
-        </div>
-        <div class="kpi">
-          <div class="t">Selic (cenário) — Taxa efetiva bruta</div>
-          <div class="v" id="kEffBruta">—</div>
-          <div class="s"><code class="inline">F − 1</code></div>
-        </div>
-        <div class="kpi">
-          <div class="t">Selic (cenário) — Taxa efetiva líquida</div>
-          <div class="v" id="kEffLiquida">—</div>
-          <div class="s">IR incide sobre o rendimento no resgate</div>
-        </div>
-        <div class="kpi">
-          <div class="t">Imposto estimado (R$)</div>
-          <div class="v" id="kIRValor">—</div>
-          <div class="s">Com base no regime selecionado</div>
-        </div>
-      </div>
-
-      <div class="hr"></div>
-
-      <div class="kpis">
-        <div class="kpi">
-          <div class="t">Pré-fixado equivalente (a.a.) — para igualar o líquido</div>
-          <div class="v" id="kPreEqAA">—</div>
-          <div class="s">Break-even (mesmo prazo e mesma regra de IR)</div>
-        </div>
-        <div class="kpi">
-          <div class="t">Pré-fixado equivalente (a.m.)</div>
-          <div class="v" id="kPreEqAM">—</div>
-          <div class="s">Conversão geométrica</div>
-        </div>
-        <div class="kpi">
-          <div class="t">Pré “de mercado” — líquido no prazo</div>
-          <div class="v" id="kPreMarketLiq">—</div>
-          <div class="s">Usando a taxa informada</div>
-        </div>
-        <div class="kpi">
-          <div class="t">Diferença vs Selic (líquido)</div>
-          <div class="v" id="kDiffPP">—</div>
-          <div class="s">Em p.p. e em R$</div>
-        </div>
-      </div>
-
-      <div class="grid2" style="margin-top:12px;">
-        <div>
-          <label>Trajetória da Selic (a.a.)</label>
-          <canvas id="chartRate" width="900" height="520"></canvas>
-        </div>
-        <div>
-          <label>Acumulado líquido (%) — Selic vs Pré “de mercado”</label>
-          <canvas id="chartAcc" width="900" height="520"></canvas>
-        </div>
-      </div>
-
-      <div class="hint" style="margin-top:10px;">
-        Fórmula do líquido (resgate único): <code class="inline">F_liq = 1 + (F_bruto − 1) · (1 − IR)</code>.
-      </div>
-    </section>
-  </main>
-
-  <footer>
-    <div class="card">
-      <b>Notas</b>
-      <ul>
-        <li>IR regressivo (Brasil): até 180d = 22,5%; 181–360d = 20%; 361–720d = 17,5%; acima de 720d = 15%.</li>
-        <li>Se você quiser simular Tesouro Direto com taxa de custódia ou fundos com come-cotas, dá para adicionar.</li>
-      </ul>
+      <div class="hint">No modo “Dias úteis”, 12 meses = ~252 pontos; no modo “Dias corridos”, 12 meses = ~365 pontos.</div>
     </div>
-  </footer>
+
+    <div class="hr"></div>
+
+    <label for="taxRegime">Imposto de renda</label>
+    <select id="taxRegime">
+      <option value="regressivo" selected>Tributável (tabela regressiva)</option>
+      <option value="isento">Isento (ex.: LCI/LCA)</option>
+      <option value="manual">Alíquota manual</option>
+    </select>
+
+    <div id="aliqManualWrap" style="display:none;">
+      <label for="aliqManual">Alíquota manual</label>
+      <input id="aliqManual" type="text" value="15%" />
+    </div>
+
+    <div class="row">
+      <div>
+        <label for="principal">Valor aplicado (R$)</label>
+        <input id="principal" type="text" value="10000" />
+      </div>
+      <div>
+        <label for="preMarket">Pré “de mercado” (a.a.)</label>
+        <input id="preMarket" type="text" value="13,00%" />
+        <div class="hint">Opcional: compara com o cenário Selic no mesmo IR/prazo.</div>
+      </div>
+    </div>
+
+    <div class="btns">
+      <button class="primary" id="btnCalc">Calcular</button>
+      <button class="ghost" id="btnShare">Copiar link</button>
+    </div>
+
+    <div class="hint warn" id="msg"></div>
+  </section>
+
+  <!-- RESULTADOS -->
+  <section class="card">
+    <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+      <span class="badge" id="badgeBase">Base: —</span>
+      <span class="badge" id="badgeHorizonte">Prazo: —</span>
+      <span class="badge" id="badgeIR">IR: —</span>
+    </div>
+
+    <div class="kpis">
+      <div class="kpi">
+        <div class="t">Selic (cenário) — Rentabilidade bruta</div>
+        <div class="v" id="kEffBruta">—</div>
+        <div class="s" id="kFatorBrutoSmall">Fator bruto: —</div>
+      </div>
+      <div class="kpi">
+        <div class="t">Selic (cenário) — Rentabilidade líquida</div>
+        <div class="v" id="kEffLiquida">—</div>
+        <div class="s" id="kFatorLiqSmall">Fator líquido: —</div>
+      </div>
+      <div class="kpi">
+        <div class="t">Montante bruto (R$)</div>
+        <div class="v" id="kMontanteBruto">—</div>
+        <div class="s">Principal + rendimento bruto</div>
+      </div>
+      <div class="kpi">
+        <div class="t">Montante líquido (R$)</div>
+        <div class="v" id="kMontanteLiq">—</div>
+        <div class="s">Descontado o IR no resgate</div>
+      </div>
+      <div class="kpi">
+        <div class="t">Imposto estimado (R$)</div>
+        <div class="v" id="kIRValor">—</div>
+        <div class="s">Incide sobre o rendimento</div>
+      </div>
+      <div class="kpi">
+        <div class="t">Pré-fixado equivalente (a.a.)</div>
+        <div class="v" id="kPreEqAA">—</div>
+        <div class="s">Que iguala o líquido da Selic no prazo</div>
+      </div>
+      <div class="kpi">
+        <div class="t">Pré “de mercado” — líquido no prazo</div>
+        <div class="v" id="kPreMarketLiq">—</div>
+        <div class="s">Usando a taxa informada</div>
+      </div>
+      <div class="kpi">
+        <div class="t">Diferença vs Selic (líquido)</div>
+        <div class="v" id="kDiffPP">—</div>
+        <div class="s">Em p.p. e em R$</div>
+      </div>
+    </div>
+
+    <div class="hr"></div>
+
+    <div class="grid2">
+      <div class="chartWrap">
+        <label>Selic (a.a.) ao longo do prazo</label>
+        <canvas id="chartRate"></canvas>
+      </div>
+      <div class="chartWrap">
+        <label>Acumulado bruto (%) — Selic vs Pré “de mercado”</label>
+        <canvas id="chartAcc"></canvas>
+      </div>
+    </div>
+
+    <div class="hint" style="margin-top:10px;">
+      Conversão diária (base <code class="inline" id="baseSpan">—</code>):
+      <code class="inline">r_d(t) = (1+r_a(t))^(1/base) − 1</code>.
+      Líquido (resgate único): <code class="inline">F_liq = 1 + (F_bruto−1)·(1−IR)</code>.
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="card">
+    <b>Notas</b>
+    <ul>
+      <li>IR regressivo (Brasil): até 180d = 22,5%; 181–360d = 20%; 361–720d = 17,5%; acima de 720d = 15%.</li>
+      <li>Degraus: você informa o intervalo em <b>dias corridos</b>. Se estiver em “dias úteis (252)”, o site converte automaticamente (45d ≈ 31 úteis).</li>
+    </ul>
+  </div>
+</footer>
 
 <script>
-/* ============
-   Formatação
-   ============ */
-const fmtPct = (x) => new Intl.NumberFormat('pt-BR', { style:'percent', maximumFractionDigits: 2 }).format(x);
-const fmtPct4 = (x) => new Intl.NumberFormat('pt-BR', { style:'percent', maximumFractionDigits: 4 }).format(x);
-const fmtBRL = (x) => new Intl.NumberFormat('pt-BR', { style:'currency', currency:'BRL', maximumFractionDigits: 2 }).format(x);
-const fmtNum = (x) => new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 10 }).format(x);
+/* =================
+   Utilidades & parse
+   ================= */
+const el = (id)=>document.getElementById(id);
+
+const fmtPct2 = (x)=> new Intl.NumberFormat('pt-BR',{style:'percent',maximumFractionDigits:2}).format(x);
+const fmtPct4 = (x)=> new Intl.NumberFormat('pt-BR',{style:'percent',maximumFractionDigits:4}).format(x);
+const fmtBRL  = (x)=> new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:2}).format(x);
+const fmtNum  = (x)=> new Intl.NumberFormat('pt-BR',{maximumFractionDigits:10}).format(x);
 
 function parseNumberBR(s){
-  // "10.000,50" -> 10000.50 ; "10000" -> 10000
   s = String(s ?? '').trim();
   if (!s) return NaN;
   s = s.replace(/\s+/g,'');
   const hasComma = s.includes(',');
   const hasDot = s.includes('.');
   if (hasComma && hasDot) {
-    // decide separador decimal pelo último
-    if (s.lastIndexOf(',') > s.lastIndexOf('.')) {
-      // comma decimal: remove dots
-      s = s.replace(/\./g,'').replace(',', '.');
-    } else {
-      // dot decimal: remove commas
-      s = s.replace(/,/g,'');
-    }
+    if (s.lastIndexOf(',') > s.lastIndexOf('.')) s = s.replace(/\./g,'').replace(',', '.');
+    else s = s.replace(/,/g,'');
   } else if (hasComma && !hasDot) {
     s = s.replace(',', '.');
   }
@@ -337,174 +325,174 @@ function parseNumberBR(s){
   return isFinite(v) ? v : NaN;
 }
 
-function parsePercentLike(s) {
-  // Aceita "15%", "15,00%", "0,15", "0.15", "15"
+function parsePercentLike(s){
   s = String(s ?? '').trim();
   if (!s) return NaN;
-  let isPct = false;
-  if (s.includes('%')) { isPct = true; s = s.replace('%',''); }
+  let isPct=false;
+  if (s.includes('%')) { isPct=true; s = s.replace('%',''); }
   const v0 = parseNumberBR(s);
   if (!isFinite(v0)) return NaN;
   let v = v0;
   if (isPct) v = v/100;
-  else if (v > 1) v = v/100; // heurística: 15 => 15%
+  else if (v > 1) v = v/100;
   return v;
 }
 
-function clamp(x, a, b){ return Math.max(a, Math.min(b, x)); }
-const el = (id)=>document.getElementById(id);
+function clamp(x,a,b){ return Math.max(a, Math.min(b,x)); }
 
-/* ============
-   IR regressivo
-   ============ */
+/* =========
+   Prazo/base
+   ========= */
+function getMeses(){
+  const preset = el('prazoPreset').value;
+  if (preset === 'custom') return Math.max(1, Math.floor(Number(el('prazoMeses').value || 1)));
+  return Number(preset);
+}
+function getBase(){ return el('unidade').value === 'uteis' ? 252 : 365; }
+function mesesToNDias(meses, base){ return Math.max(1, Math.round(meses * base / 12)); }
+
+/* =========
+   IR
+   ========= */
 function irAliquotaDias(days){
   if (days <= 180) return 0.225;
   if (days <= 360) return 0.20;
   if (days <= 720) return 0.175;
   return 0.15;
 }
-
-function getTaxConfig(meses){
-  const regime = el('taxRegime').value;
-  if (regime === 'isento') return { regime, aliq: 0, diasIR: calcDiasIR(meses), label: 'Isento (0%)' };
-
-  if (regime === 'manual') {
-    const a = parsePercentLike(el('aliqManual').value);
-    const aliq = isFinite(a) ? clamp(a, 0, 0.999) : 0;
-    return { regime, aliq, diasIR: calcDiasIR(meses), label: `Manual (${fmtPct(aliq)})` };
-  }
-
-  const diasIR = calcDiasIR(meses);
-  const aliq = irAliquotaDias(diasIR);
-  return { regime, aliq, diasIR, label: `Regressivo (${fmtPct(aliq)} em ${diasIR} dias)` };
-}
-
 function calcDiasIR(meses){
   const conv = Number(el('diasIRConv').value || 365);
   return Math.round((meses * conv) / 12);
 }
+function getTaxConfig(meses){
+  const regime = el('taxRegime').value;
+  const diasIR = calcDiasIR(meses);
 
-/* ==========================
-   Horizonte: meses -> N dias
-   ========================== */
-function getMeses(){
-  const preset = el('prazoPreset').value;
-  if (preset === 'custom') {
-    return Math.max(1, Math.floor(Number(el('prazoMeses').value || 1)));
+  if (regime === 'isento') return {regime, aliq:0, diasIR, label:'Isento (0%)'};
+  if (regime === 'manual') {
+    const a = parsePercentLike(el('aliqManual').value);
+    const aliq = isFinite(a) ? clamp(a,0,0.999) : 0;
+    return {regime, aliq, diasIR, label:`Manual (${fmtPct2(aliq)})`};
   }
-  return Number(preset);
+  const aliq = irAliquotaDias(diasIR);
+  return {regime, aliq, diasIR, label:`Regressivo (${fmtPct2(aliq)} em ${diasIR} dias)`};
 }
 
-function getBase(){
-  return el('unidade').value === 'uteis' ? 252 : 365;
+/* =====================
+   Degraus: calendário -> base
+   ===================== */
+function stepEveryInBase(stepEveryCalendar, base){
+  // passo = dias corridos; se base=252, converte (aprox) via 252/365
+  if (base === 365) return Math.max(1, Math.round(stepEveryCalendar));
+  const conv = 252/365;
+  return Math.max(1, Math.round(stepEveryCalendar * conv));
 }
-
-function mesesToNDias(meses, base){
-  // Converte meses para nº de passos diários na base escolhida.
-  // Ex.: 12 meses -> 252 (úteis) ou 365 (corridos)
-  return Math.max(1, Math.round(meses * base / 12));
+function refreshStepHint(){
+  const base = getBase();
+  const cal = Math.max(1, Number(el('stepEveryCalendar').value || 45));
+  const step = stepEveryInBase(cal, base);
+  el('stepEveryHint').textContent = base === 252
+    ? `≈ ${step} dias úteis na base 252`
+    : `≈ ${step} dias corridos na base 365`;
 }
 
 /* ==========================
-   Modelos de trajetória Selic
+   Trajetórias Selic (a.a.)
    ========================== */
-function buildPath({N, r0, r1, scenario, curv, expo, stepEvery, stepSize, customText}) {
+function buildPath({N, r0, r1, scenario, curv, expo, stepEveryCalendar, stepSize, base, customText}){
   const rates = new Array(N).fill(r0);
 
-  if (scenario === 'linear') {
+  if (scenario === 'linear'){
     for (let i=0;i<N;i++){
-      const x = (N===1) ? 1 : i/(N-1);
-      rates[i] = r0 + (r1 - r0)*x;
+      const x = (N===1)?1:i/(N-1);
+      rates[i] = r0 + (r1-r0)*x;
     }
     return rates;
   }
 
-  if (scenario === 'exponencial') {
+  if (scenario === 'exponencial'){
     for (let i=0;i<N;i++){
-      const x = (N===1) ? 1 : i/(N-1);
-      const x2 = 1 - Math.pow(1 - x, clamp(curv, 0.2, 10));
-      const a = 1 + r0, b = 1 + r1;
+      const x = (N===1)?1:i/(N-1);
+      const x2 = 1 - Math.pow(1-x, clamp(curv,0.2,10));
+      const a = 1+r0, b = 1+r1;
       rates[i] = a * Math.pow(b/a, x2) - 1;
     }
     return rates;
   }
 
-  if (scenario === 'potencia') {
-    const p = clamp(expo, 0.2, 10);
+  if (scenario === 'potencia'){
+    const p = clamp(expo,0.2,10);
     for (let i=0;i<N;i++){
-      const x = (N===1) ? 1 : i/(N-1);
-      rates[i] = r0 + (r1 - r0)*Math.pow(x, p);
+      const x = (N===1)?1:i/(N-1);
+      rates[i] = r0 + (r1-r0)*Math.pow(x,p);
     }
     return rates;
   }
 
-  if (scenario === 'logistica') {
-    const s = clamp(curv, 0.2, 10);
-    const L = (z) => 1/(1 + Math.exp(-z));
-    const L0 = L(-s*(0 - 0.5));
-    const L1 = L(-s*(1 - 0.5));
+  if (scenario === 'logistica'){
+    const s = clamp(curv,0.2,10);
+    const L = (z)=> 1/(1+Math.exp(-z));
+    const L0 = L(-s*(0-0.5));
+    const L1 = L(-s*(1-0.5));
     for (let i=0;i<N;i++){
-      const x = (N===1) ? 1 : i/(N-1);
-      const u = (L(-s*(x - 0.5)) - L0) / (L1 - L0);
-      rates[i] = r0 + (r1 - r0)*u;
+      const x = (N===1)?1:i/(N-1);
+      const u = (L(-s*(x-0.5)) - L0) / (L1 - L0);
+      rates[i] = r0 + (r1-r0)*u;
     }
     return rates;
   }
 
-  if (scenario === 'degraus') {
-    const every = Math.max(1, Math.floor(stepEvery || 45));
-    const nSteps = Math.ceil(N / every);
-    const sz = (stepSize && stepSize > 0) ? (stepSize/100) : 0;
+  if (scenario === 'degraus'){
+    const every = stepEveryInBase(stepEveryCalendar, base);
+    const nSteps = Math.ceil(N/every);
+    const sz = (stepSize && stepSize>0) ? (stepSize/100) : 0;
 
     for (let k=0;k<nSteps;k++){
       const start = k*every;
       const end = Math.min(N, (k+1)*every);
       let rk;
-      if (sz > 0) rk = Math.max(r1, r0 - k*sz);
+      if (sz>0) rk = Math.max(r1, r0 - k*sz);
       else {
-        const x = (nSteps===1) ? 1 : k/(nSteps-1);
-        rk = r0 + (r1 - r0)*x;
+        const x = (nSteps===1)?1:k/(nSteps-1);
+        rk = r0 + (r1-r0)*x;
       }
       for (let i=start;i<end;i++) rates[i]=rk;
     }
     return rates;
   }
 
-  if (scenario === 'custom') {
+  if (scenario === 'custom'){
     return buildCustomPath(N, r0, r1, customText);
   }
 
   return rates;
 }
 
-function buildCustomPath(N, r0, r1, text) {
-  const rates = new Array(N).fill(N>0 ? r0 : 0);
+function buildCustomPath(N, r0, r1, text){
+  const rates = new Array(N).fill(r0);
+  const lines = String(text||'').split('\n').map(x=>x.trim()).filter(x=>x && !x.startsWith('#'));
 
-  const lines = String(text||'').split('\n')
-    .map(l => l.trim())
-    .filter(l => l && !l.startsWith('#'));
-
-  if (!lines.length) {
+  if (!lines.length){
     for (let i=0;i<N;i++){
-      const x = (N===1) ? 1 : i/(N-1);
-      rates[i] = r0 + (r1 - r0)*x;
+      const x = (N===1)?1:i/(N-1);
+      rates[i] = r0 + (r1-r0)*x;
     }
     return rates;
   }
 
-  for (const line of lines) {
+  for (const line of lines){
     let parts = line.split(';').map(x=>x.trim());
-    if (parts.length < 2) parts = line.split('|').map(x=>x.trim());
-    if (parts.length < 2) continue;
+    if (parts.length<2) parts = line.split('|').map(x=>x.trim());
+    if (parts.length<2) continue;
 
     const left = parts[0];
     const rate = parsePercentLike(parts[1]);
     if (!isFinite(rate)) continue;
 
     const m = left.match(/^(\d+)\s*-\s*(\d+)$/);
-    if (m) {
-      const a = clamp(parseInt(m[1],10), 1, N);
-      const b = clamp(parseInt(m[2],10), 1, N);
+    if (m){
+      const a = clamp(parseInt(m[1],10),1,N);
+      const b = clamp(parseInt(m[2],10),1,N);
       const start = Math.min(a,b)-1;
       const end = Math.max(a,b)-1;
       for (let i=start;i<=end;i++) rates[i]=rate;
@@ -512,111 +500,115 @@ function buildCustomPath(N, r0, r1, text) {
     }
 
     const d = parseInt(left,10);
-    if (isFinite(d) && d>=1 && d<=N) rates[d-1] = rate;
+    if (isFinite(d) && d>=1 && d<=N) rates[d-1]=rate;
   }
 
+  // forward fill
   let last = rates[0];
-  for (let i=0;i<N;i++){
-    if (!isFinite(rates[i])) rates[i]=last;
-    last = rates[i];
-  }
+  for (let i=0;i<N;i++){ rates[i] = isFinite(rates[i]) ? rates[i] : last; last = rates[i]; }
   return rates;
 }
 
 /* ==========================
-   Cálculo: bruto e líquido
+   Cálculo de fatores
    ========================== */
 function grossFactorFromRatesAA(ratesAA, base){
-  let F = 1;
-  const accBruto = new Array(ratesAA.length);
+  let F=1;
+  const acc = new Array(ratesAA.length);
   for (let i=0;i<ratesAA.length;i++){
     const rAA = ratesAA[i];
-    const rD = Math.pow(1 + rAA, 1/base) - 1;
-    F *= (1 + rD);
-    accBruto[i] = F;
+    const rD = Math.pow(1+rAA, 1/base) - 1;
+    F *= (1+rD);
+    acc[i]=F;
   }
-  return { F, accBruto };
+  return {F, acc};
 }
-
-function netFactorFromGross(Fbruto, irAliq){
-  return 1 + (Fbruto - 1) * (1 - irAliq);
-}
-
-function preFixedGrossFactor(rateAA, N, base){
-  return Math.pow(1 + rateAA, N/base);
-}
-
-function solvePreFixedEquivalentAA(FliqTarget, irAliq, N, base){
-  // Dado F_liq alvo, volta ao F_bruto necessário e resolve r_a:
-  // F_liq = 1 + (F_bruto - 1)*(1 - ir) => F_bruto = 1 + (F_liq - 1)/(1 - ir)
-  const denom = (1 - irAliq);
-  const FbrutoNeeded = denom > 0 ? (1 + (FliqTarget - 1)/denom) : Infinity;
+function netFactorFromGross(Fbruto, ir){ return 1 + (Fbruto-1)*(1-ir); }
+function preFixedGrossFactor(rateAA, N, base){ return Math.pow(1+rateAA, N/base); }
+function solvePreFixedEquivalentAA(FliqTarget, ir, N, base){
+  const denom = (1-ir);
+  const FbrutoNeeded = denom>0 ? (1 + (FliqTarget-1)/denom) : Infinity;
   const rAA = Math.pow(FbrutoNeeded, base/N) - 1;
-  return { rAA, FbrutoNeeded };
+  return {rAA, FbrutoNeeded};
 }
 
 /* ==========================
-   Gráficos (canvas simples)
+   Canvas DPI + chart
    ========================== */
-function drawLineChart(canvas, seriesA, seriesB, opts) {
-  // seriesB opcional
+function setupCanvas(canvas){
+  const dpr = window.devicePixelRatio || 1;
+  const cssW = canvas.clientWidth;
+  const cssH = canvas.clientHeight;
+  canvas.width = Math.round(cssW * dpr);
+  canvas.height = Math.round(cssH * dpr);
   const ctx = canvas.getContext('2d');
-  const W = canvas.width, H = canvas.height;
+  ctx.setTransform(dpr,0,0,dpr,0,0); // draw in CSS pixels
+  return ctx;
+}
+
+function drawLineChart(canvas, seriesA, seriesB, opts){
+  const ctx = setupCanvas(canvas);
+  const W = canvas.clientWidth, H = canvas.clientHeight;
+
   ctx.clearRect(0,0,W,H);
 
-  const pad = {l:60, r:18, t:18, b:44};
+  const pad = {l:72, r:18, t:18, b:54};
   const x0 = pad.l, x1 = W - pad.r, y0 = H - pad.b, y1 = pad.t;
 
   const n = seriesA.length;
   if (!n) return;
 
-  let ymin = Infinity, ymax = -Infinity;
+  let ymin=Infinity, ymax=-Infinity;
   const scan = (arr)=>{ for(const y of arr){ ymin=Math.min(ymin,y); ymax=Math.max(ymax,y);} };
-  scan(seriesA);
-  if (seriesB) scan(seriesB);
-  if (ymin === ymax) { ymin -= 1; ymax += 1; }
+  scan(seriesA); if (seriesB) scan(seriesB);
+  if (ymin===ymax){ ymin-=1; ymax+=1; }
 
-  // grade
+  // background grid
   ctx.strokeStyle = 'rgba(255,255,255,.08)';
   ctx.lineWidth = 1;
-  const ticks = 5;
-  for (let i=0;i<=ticks;i++){
-    const yy = y1 + (y0-y1)*(i/ticks);
-    ctx.beginPath(); ctx.moveTo(x0, yy); ctx.lineTo(x1, yy); ctx.stroke();
+
+  const yTicks = opts.yTicks ?? 5;
+  const xTicks = opts.xTicks ?? 6;
+
+  for (let i=0;i<=yTicks;i++){
+    const yy = y1 + (y0-y1)*(i/yTicks);
+    ctx.beginPath(); ctx.moveTo(x0,yy); ctx.lineTo(x1,yy); ctx.stroke();
   }
-  for (let i=0;i<=ticks;i++){
-    const xx = x0 + (x1-x0)*(i/ticks);
-    ctx.beginPath(); ctx.moveTo(xx, y1); ctx.lineTo(xx, y0); ctx.stroke();
+  for (let i=0;i<=xTicks;i++){
+    const xx = x0 + (x1-x0)*(i/xTicks);
+    ctx.beginPath(); ctx.moveTo(xx,y1); ctx.lineTo(xx,y0); ctx.stroke();
   }
 
-  // eixos
-  ctx.strokeStyle = 'rgba(255,255,255,.18)';
-  ctx.beginPath(); ctx.moveTo(x0, y1); ctx.lineTo(x0, y0); ctx.lineTo(x1, y0); ctx.stroke();
+  // axes
+  ctx.strokeStyle = 'rgba(255,255,255,.20)';
+  ctx.beginPath(); ctx.moveTo(x0,y1); ctx.lineTo(x0,y0); ctx.lineTo(x1,y0); ctx.stroke();
 
-  // labels y
-  ctx.fillStyle = 'rgba(229,231,235,.85)';
-  ctx.font = '12px system-ui,-apple-system,Segoe UI,Roboto,Arial';
+  // labels
+  ctx.font = '14px system-ui,-apple-system,Segoe UI,Roboto,Arial';
+  ctx.fillStyle = 'rgba(229,231,235,.88)';
+
+  // y labels
   ctx.textAlign = 'right';
   ctx.textBaseline = 'middle';
-  for (let i=0;i<=ticks;i++){
-    const val = ymax - (ymax-ymin)*(i/ticks);
-    const yy = y1 + (y0-y1)*(i/ticks);
-    ctx.fillText(opts.formatY(val), x0-8, yy);
+  for (let i=0;i<=yTicks;i++){
+    const val = ymax - (ymax-ymin)*(i/yTicks);
+    const yy = y1 + (y0-y1)*(i/yTicks);
+    ctx.fillText(opts.formatY(val), x0-10, yy);
   }
 
-  // labels x (dia)
+  // x labels
   ctx.textAlign = 'center';
   ctx.textBaseline = 'top';
-  for (let i=0;i<=ticks;i++){
-    const idx = Math.round((n-1)*(i/ticks));
-    const xx = x0 + (x1-x0)*(i/ticks);
-    ctx.fillStyle = 'rgba(156,163,175,.9)';
-    ctx.fillText(opts.formatX(idx), xx, y0+10);
+  for (let i=0;i<=xTicks;i++){
+    const idx = Math.round((n-1)*(i/xTicks));
+    const xx = x0 + (x1-x0)*(i/xTicks);
+    ctx.fillStyle = 'rgba(156,163,175,.95)';
+    ctx.fillText(opts.formatX(idx), xx, y0+14);
   }
 
-  function plot(arr, strokeStyle, lineWidth){
+  function plot(arr, strokeStyle, lw){
     ctx.strokeStyle = strokeStyle;
-    ctx.lineWidth = lineWidth;
+    ctx.lineWidth = lw;
     ctx.beginPath();
     for (let i=0;i<n;i++){
       const x = x0 + (x1-x0)*(i/(n-1));
@@ -626,36 +618,36 @@ function drawLineChart(canvas, seriesA, seriesB, opts) {
     ctx.stroke();
   }
 
-  plot(seriesA, 'rgba(34,197,94,.95)', 2.35);
-  if (seriesB) plot(seriesB, 'rgba(245,158,11,.95)', 2.0);
+  plot(seriesA, 'rgba(34,197,94,.95)', 2.6);
+  if (seriesB) plot(seriesB, 'rgba(245,158,11,.95)', 2.2);
 
-  // título
-  if (opts.title) {
-    ctx.fillStyle = 'rgba(229,231,235,.9)';
-    ctx.font = '13px system-ui,-apple-system,Segoe UI,Roboto,Arial';
+  // title
+  if (opts.title){
+    ctx.fillStyle = 'rgba(229,231,235,.92)';
+    ctx.font = '15px system-ui,-apple-system,Segoe UI,Roboto,Arial';
     ctx.textAlign = 'left';
     ctx.textBaseline = 'top';
     ctx.fillText(opts.title, x0, 8);
   }
 
-  // legenda simples
+  // legend
   if (opts.legendA || opts.legendB){
-    const yLeg = 30;
+    const yLeg = 34;
     let xLeg = x0;
+    ctx.font = '13px system-ui,-apple-system,Segoe UI,Roboto,Arial';
     ctx.textBaseline = 'middle';
-    ctx.font = '12px system-ui,-apple-system,Segoe UI,Roboto,Arial';
     if (opts.legendA){
       ctx.fillStyle = 'rgba(34,197,94,.95)';
-      ctx.fillRect(xLeg, yLeg, 12, 4);
-      ctx.fillStyle = 'rgba(229,231,235,.85)';
-      ctx.fillText(opts.legendA, xLeg+18, yLeg+2);
-      xLeg += 130;
+      ctx.fillRect(xLeg, yLeg, 14, 5);
+      ctx.fillStyle = 'rgba(229,231,235,.86)';
+      ctx.fillText(opts.legendA, xLeg+20, yLeg+2);
+      xLeg += 150;
     }
     if (opts.legendB){
       ctx.fillStyle = 'rgba(245,158,11,.95)';
-      ctx.fillRect(xLeg, yLeg, 12, 4);
-      ctx.fillStyle = 'rgba(229,231,235,.85)';
-      ctx.fillText(opts.legendB, xLeg+18, yLeg+2);
+      ctx.fillRect(xLeg, yLeg, 14, 5);
+      ctx.fillStyle = 'rgba(229,231,235,.86)';
+      ctx.fillText(opts.legendB, xLeg+20, yLeg+2);
     }
   }
 }
@@ -664,35 +656,18 @@ function drawLineChart(canvas, seriesA, seriesB, opts) {
    UI / execução
    ========================== */
 function updateVisibility(){
-  const scen = el('cenario').value;
-  el('customBox').style.display = (scen === 'custom') ? 'block' : 'none';
-
-  const preset = el('prazoPreset').value;
-  el('prazoCustomWrap').style.display = (preset === 'custom') ? 'block' : 'none';
-
-  const tax = el('taxRegime').value;
-  el('aliqManualWrap').style.display = (tax === 'manual') ? 'block' : 'none';
+  el('customBox').style.display = (el('cenario').value === 'custom') ? 'block' : 'none';
+  el('prazoCustomWrap').style.display = (el('prazoPreset').value === 'custom') ? 'block' : 'none';
+  el('aliqManualWrap').style.display = (el('taxRegime').value === 'manual') ? 'block' : 'none';
+  refreshStepHint();
 }
 
-function validateInputs({r0, r1, principal, preMarketAA}){
-  const msg = el('msg');
-  msg.textContent = '';
-  if (!isFinite(r0) || !isFinite(r1)) {
-    msg.textContent = 'Verifique Selic inicial/final. Use 15% ou 15,00%.';
-    return false;
-  }
-  if (r0 <= -0.999 || r1 <= -0.999) {
-    msg.textContent = 'As taxas precisam ser maiores que -100%.';
-    return false;
-  }
-  if (!isFinite(principal) || principal <= 0) {
-    msg.textContent = 'Informe um valor aplicado (R$) válido.';
-    return false;
-  }
-  if (!isFinite(preMarketAA)) {
-    msg.textContent = 'Taxa pré “de mercado” inválida. Use algo como 13% (ou deixe válido).';
-    return false;
-  }
+function validateInputs({r0,r1,principal,preMarketAA}){
+  const msg = el('msg'); msg.textContent='';
+  if (!isFinite(r0) || !isFinite(r1)){ msg.textContent='Verifique Selic inicial/final (ex.: 15% ou 15,00%).'; return false; }
+  if (r0 <= -0.999 || r1 <= -0.999){ msg.textContent='Taxas precisam ser maiores que -100%.'; return false; }
+  if (!isFinite(principal) || principal <= 0){ msg.textContent='Informe um valor aplicado (R$) válido.'; return false; }
+  if (!isFinite(preMarketAA)){ msg.textContent='Taxa pré “de mercado” inválida.'; return false; }
   return true;
 }
 
@@ -708,94 +683,96 @@ function run(){
   const preMarketAA = parsePercentLike(el('preMarket').value);
   const principal = parseNumberBR(el('principal').value);
 
+  if (!validateInputs({r0,r1,principal,preMarketAA})) return;
+
   const scenario = el('cenario').value;
   const curv = Number(el('curv').value || 2);
   const expo = Number(el('expo').value || 1);
-  const stepEvery = Number(el('stepEvery').value || 45);
+  const stepEveryCalendar = Number(el('stepEveryCalendar').value || 45);
   const stepSize = Number(el('stepSize').value || 0.5);
   const customText = el('customText').value;
 
-  if (!validateInputs({r0, r1, principal, preMarketAA})) return;
-
   const taxCfg = getTaxConfig(meses);
-  const irAliq = taxCfg.aliq;
+  const ir = taxCfg.aliq;
 
-  const ratesAA = buildPath({N, r0, r1, scenario, curv, expo, stepEvery, stepSize, customText});
-  const {F: Fbruto, accBruto} = grossFactorFromRatesAA(ratesAA, base);
-  const Fliq = netFactorFromGross(Fbruto, irAliq);
+  const ratesAA = buildPath({N,r0,r1,scenario,curv,expo,stepEveryCalendar,stepSize,base,customText});
+  const {F:Fbruto, acc:accBruto} = grossFactorFromRatesAA(ratesAA, base);
+  const Fliq = netFactorFromGross(Fbruto, ir);
 
   const effBruta = Fbruto - 1;
   const effLiquida = Fliq - 1;
 
-  const rendBruto = principal * (Fbruto - 1);
-  const irValor = rendBruto * irAliq;
+  const rendBruto = principal * effBruta;
+  const irValor = rendBruto * ir;
+  const montanteBruto = principal + rendBruto;
   const montanteLiq = principal + rendBruto - irValor;
 
-  // Pré-fixado equivalente
-  const {rAA: preEqAA} = solvePreFixedEquivalentAA(Fliq, irAliq, N, base);
-  const preEqAM = Math.pow(1 + preEqAA, 1/12) - 1;
+  const {rAA: preEqAA} = solvePreFixedEquivalentAA(Fliq, ir, N, base);
 
-  // Pré "de mercado" (comparativo)
   const FpreMktBruto = preFixedGrossFactor(preMarketAA, N, base);
-  const FpreMktLiq = netFactorFromGross(FpreMktBruto, irAliq);
+  const FpreMktLiq = netFactorFromGross(FpreMktBruto, ir);
   const preMktLiqEff = FpreMktLiq - 1;
 
   const diffEff = preMktLiqEff - effLiquida;
   const diffBRL = principal * (FpreMktLiq - Fliq);
 
-  // UI badges
-  const unidadeTxt = (el('unidade').value === 'uteis') ? 'dias úteis' : 'dias corridos';
+  // badges
+  const unidadeTxt = (base===252) ? 'dias úteis' : 'dias corridos';
   el('badgeBase').textContent = `Base: ${base} (${unidadeTxt})`;
   el('badgeHorizonte').textContent = `Prazo: ${meses} meses → ${N} ${unidadeTxt}`;
   el('badgeIR').textContent = `IR: ${taxCfg.label}`;
+  el('baseSpan').textContent = String(base);
 
-  // KPIs Selic
-  el('kFatorBruto').textContent = fmtNum(Fbruto);
-  el('kEffBruta').textContent = fmtPct(effBruta);
-  el('kEffLiquida').textContent = fmtPct(effLiquida);
+  // KPIs claros (percentual + R$)
+  el('kEffBruta').textContent = fmtPct2(effBruta);
+  el('kEffLiquida').textContent = fmtPct2(effLiquida);
+  el('kMontanteBruto').textContent = fmtBRL(montanteBruto);
+  el('kMontanteLiq').textContent = fmtBRL(montanteLiq);
   el('kIRValor').textContent = fmtBRL(irValor);
-
-  // KPIs pré equivalente / comparação
   el('kPreEqAA').textContent = fmtPct4(preEqAA);
-  el('kPreEqAM').textContent = fmtPct4(preEqAM);
-  el('kPreMarketLiq').textContent = fmtPct(preMktLiqEff);
+  el('kPreMarketLiq').textContent = fmtPct2(preMktLiqEff);
+
+  el('kFatorBrutoSmall').textContent = `Fator bruto: ${fmtNum(Fbruto)}`;
+  el('kFatorLiqSmall').textContent = `Fator líquido: ${fmtNum(Fliq)}`;
 
   const sign = diffEff >= 0 ? '+' : '';
-  el('kDiffPP').textContent = `${sign}${(diffEff*100).toLocaleString('pt-BR',{maximumFractionDigits:2})} p.p. | ${diffBRL>=0?'+':''}${fmtBRL(diffBRL)}`;
+  el('kDiffPP').textContent =
+    `${sign}${(diffEff*100).toLocaleString('pt-BR',{maximumFractionDigits:2})} p.p. | ${diffBRL>=0?'+':''}${fmtBRL(diffBRL)}`;
 
-  // Charts
-  const ratePct = ratesAA.map(r => r*100);
+  // gráficos: eixo X em meses (0..meses)
+  const ratePct = ratesAA.map(r=> r*100);
 
-  // acumulado líquido Selic: aplica IR só no final, então desenha líquido "proporcional" apenas como visual:
-  // para não enganar, vamos desenhar 2 curvas:
-  // 1) acumulado bruto (Selic) em % (linha verde)
-  // 2) acumulado bruto pré-market convertido em % (linha amarela)
-  // e mostramos uma anotação textual de que o IR é no final (o líquido real é o KPI).
-  const accSelicPct = accBruto.map(F => (F-1)*100);
-  const accPrePct = accBruto.map((_, i) => {
+  const accSelicPct = accBruto.map(F=> (F-1)*100);
+  const accPrePct = accBruto.map((_,i)=>{
     const Fi = Math.pow(1 + preMarketAA, (i+1)/base);
-    return (Fi - 1)*100;
+    return (Fi-1)*100;
   });
 
+  const xLabelMonths = (idx)=>{
+    const t = (idx/(N-1)) * meses; // 0..meses
+    return `${t.toLocaleString('pt-BR',{maximumFractionDigits:0})}m`;
+  };
+
   drawLineChart(el('chartRate'), ratePct, null, {
-    title: 'Selic (a.a.) ao longo do horizonte',
+    title: 'Selic (a.a.)',
     formatY: (v)=> v.toLocaleString('pt-BR',{maximumFractionDigits:2}) + '%',
-    formatX: (i)=> `${i+1}`,
+    formatX: xLabelMonths,
+    xTicks: Math.min(6, Math.max(3, meses/6))
   });
 
   drawLineChart(el('chartAcc'), accSelicPct, accPrePct, {
-    title: 'Acumulado bruto (%) — Selic vs Pré “de mercado” (IR é no final)',
+    title: 'Acumulado bruto (%) — (IR é no final)',
     formatY: (v)=> v.toLocaleString('pt-BR',{maximumFractionDigits:2}) + '%',
-    formatX: (i)=> `${i+1}`,
+    formatX: xLabelMonths,
     legendA: 'Selic (bruto)',
-    legendB: 'Pré (bruto)'
+    legendB: 'Pré (bruto)',
+    xTicks: Math.min(6, Math.max(3, meses/6))
   });
 
-  // Mensagem contextual
-  const msg = el('msg');
-  msg.textContent = `O “pré-fixado equivalente” (${fmtPct4(preEqAA)} a.a.) é o que iguala o rendimento líquido do cenário Selic no prazo.`;
+  el('msg').textContent = `Degraus: ${Number(el('stepEveryCalendar').value||45)} dias corridos ≈ ${stepEveryInBase(Number(el('stepEveryCalendar').value||45), base)} na base atual.`;
 }
 
+/* ===== share link ===== */
 function setFromQuery(){
   const q = new URLSearchParams(location.search);
   const get = (k)=> q.get(k);
@@ -809,10 +786,9 @@ function setFromQuery(){
   if (get('s')) el('cenario').value = get('s');
   if (get('curv')) el('curv').value = get('curv');
   if (get('expo')) el('expo').value = get('expo');
-  if (get('stepEvery')) el('stepEvery').value = get('stepEvery');
+  if (get('stepCal')) el('stepEveryCalendar').value = get('stepCal');
   if (get('stepSize')) el('stepSize').value = get('stepSize');
   if (get('custom')) el('customText').value = decodeURIComponent(get('custom'));
-
   if (get('tax')) el('taxRegime').value = get('tax');
   if (get('aliq')) el('aliqManual').value = get('aliq');
   if (get('P')) el('principal').value = get('P');
@@ -823,13 +799,10 @@ function setFromQuery(){
 
 function copyShareLink(){
   const meses = getMeses();
-  const preset = el('prazoPreset').value;
-  const baseSel = el('unidade').value;
-
   const q = new URLSearchParams();
-  q.set('preset', preset);
+  q.set('preset', el('prazoPreset').value);
   q.set('meses', String(meses));
-  q.set('u', baseSel);
+  q.set('u', el('unidade').value);
   q.set('irconv', el('diasIRConv').value);
 
   q.set('r0', el('r0').value);
@@ -837,9 +810,8 @@ function copyShareLink(){
   q.set('s', el('cenario').value);
   q.set('curv', el('curv').value);
   q.set('expo', el('expo').value);
-  q.set('stepEvery', el('stepEvery').value);
+  q.set('stepCal', el('stepEveryCalendar').value);
   q.set('stepSize', el('stepSize').value);
-
   if (el('cenario').value === 'custom') q.set('custom', encodeURIComponent(el('customText').value));
 
   q.set('tax', el('taxRegime').value);
@@ -849,24 +821,21 @@ function copyShareLink(){
   q.set('pre', el('preMarket').value);
 
   const url = `${location.origin}${location.pathname}?${q.toString()}`;
-  navigator.clipboard.writeText(url).then(()=>{
-    el('msg').textContent = 'Link copiado para a área de transferência.';
-  }).catch(()=>{
-    el('msg').textContent = 'Não consegui copiar automaticamente. Copie manualmente da barra de endereço.';
-  });
+  navigator.clipboard.writeText(url).then(()=> el('msg').textContent='Link copiado.').catch(()=> el('msg').textContent='Não consegui copiar automaticamente.');
 }
 
 /* listeners */
 ['change','input'].forEach(evt=>{
-  el('prazoPreset').addEventListener(evt, ()=>{ updateVisibility(); });
-  el('taxRegime').addEventListener(evt, ()=>{ updateVisibility(); });
-  el('cenario').addEventListener(evt, ()=>{ updateVisibility(); });
+  el('prazoPreset').addEventListener(evt, ()=>{ updateVisibility(); run(); });
+  el('prazoMeses').addEventListener(evt, ()=>{ updateVisibility(); run(); });
+  el('unidade').addEventListener(evt, ()=>{ updateVisibility(); run(); });
+  el('cenario').addEventListener(evt, ()=>{ updateVisibility(); run(); });
+  el('taxRegime').addEventListener(evt, ()=>{ updateVisibility(); run(); });
+  el('stepEveryCalendar').addEventListener(evt, ()=>{ updateVisibility(); run(); });
 });
 el('btnCalc').addEventListener('click', run);
 el('btnShare').addEventListener('click', copyShareLink);
-document.addEventListener('keydown', (e)=>{
-  if (e.key === 'Enter' && (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT')) run();
-});
+window.addEventListener('resize', ()=> run());
 
 setFromQuery();
 run();
