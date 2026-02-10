@@ -36,7 +36,8 @@
       border-color:rgba(34,197,94,.55); box-shadow:0 0 0 3px rgba(34,197,94,.12);
     }
     textarea{
-      min-height:120px; resize:vertical; font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+      min-height:120px; resize:vertical;
+      font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
       font-size:12px; line-height:1.35;
     }
     .row{ display:flex; gap:10px; }
@@ -115,11 +116,8 @@
         </select>
       </div>
       <div>
-        <label for="diasIRConv">Convenção de dias p/ IR</label>
-        <select id="diasIRConv">
-          <option value="365" selected>365 dias/ano</option>
-          <option value="360">360 dias/ano</option>
-        </select>
+        <label for="principal">Valor aplicado (R$)</label>
+        <input id="principal" type="text" value="10000" />
       </div>
     </div>
 
@@ -178,7 +176,7 @@
 64-126; 14%
 127-189; 13%
 190-252; 11,5%</textarea>
-      <div class="hint">No modo “Dias úteis”, 12 meses = ~252 pontos; no modo “Dias corridos”, 12 meses = ~365 pontos.</div>
+      <div class="hint">No modo “Dias úteis”, 12 meses ≈ 252 pontos; no modo “Dias corridos”, 12 meses ≈ 365 pontos.</div>
     </div>
 
     <div class="hr"></div>
@@ -197,18 +195,17 @@
 
     <div class="row">
       <div>
-        <label for="principal">Valor aplicado (R$)</label>
-        <input id="principal" type="text" value="10000" />
-      </div>
-      <div>
         <label for="preMarket">Pré “de mercado” (a.a.)</label>
         <input id="preMarket" type="text" value="13,00%" />
-        <div class="hint">Opcional: compara com o cenário Selic no mesmo IR/prazo.</div>
+        <div class="hint">Comparativo opcional: rendimento líquido desse pré no mesmo prazo/IR.</div>
+      </div>
+      <div>
+        <label for="btnCalc" style="opacity:.0">.</label>
+        <button class="primary" id="btnCalc">Calcular</button>
       </div>
     </div>
 
     <div class="btns">
-      <button class="primary" id="btnCalc">Calcular</button>
       <button class="ghost" id="btnShare">Copiar link</button>
     </div>
 
@@ -283,17 +280,21 @@
       Conversão diária (base <code class="inline" id="baseSpan">—</code>):
       <code class="inline">r_d(t) = (1+r_a(t))^(1/base) − 1</code>.
       Líquido (resgate único): <code class="inline">F_liq = 1 + (F_bruto−1)·(1−IR)</code>.
+      IR regressivo usa <b>dias corridos equivalentes</b> ao horizonte (úteis → corridos via 365/252).
     </div>
   </section>
 </main>
 
 <footer>
   <div class="card">
-    <b>Notas</b>
+    <b>Tabela regressiva (Brasil)</b>
     <ul>
-      <li>IR regressivo (Brasil): até 180d = 22,5%; 181–360d = 20%; 361–720d = 17,5%; acima de 720d = 15%.</li>
-      <li>Degraus: você informa o intervalo em <b>dias corridos</b>. Se estiver em “dias úteis (252)”, o site converte automaticamente (45d ≈ 31 úteis).</li>
+      <li>Até 180 dias: 22,5%</li>
+      <li>181 a 360 dias: 20%</li>
+      <li>361 a 720 dias: 17,5%</li>
+      <li>Acima de 720 dias: 15%</li>
     </ul>
+    <div class="hint">Observação: 720 dias ainda é 17,5%. 15% só vale a partir de 721 dias.</div>
   </div>
 </footer>
 
@@ -352,7 +353,7 @@ function getBase(){ return el('unidade').value === 'uteis' ? 252 : 365; }
 function mesesToNDias(meses, base){ return Math.max(1, Math.round(meses * base / 12)); }
 
 /* =========
-   IR
+   IR (corrigido)
    ========= */
 function irAliquotaDias(days){
   if (days <= 180) return 0.225;
@@ -360,13 +361,16 @@ function irAliquotaDias(days){
   if (days <= 720) return 0.175;
   return 0.15;
 }
-function calcDiasIR(meses){
-  const conv = Number(el('diasIRConv').value || 365);
-  return Math.round((meses * conv) / 12);
+
+function diasCorridosEquivalentes(N, base){
+  // Se a simulação está em dias corridos, diasIR = N
+  // Se está em dias úteis (base 252), converte p/ corridos (aprox) via 365/252
+  return base === 365 ? N : Math.round(N * 365 / 252);
 }
-function getTaxConfig(meses){
+
+function getTaxConfig({N, base}){
   const regime = el('taxRegime').value;
-  const diasIR = calcDiasIR(meses);
+  const diasIR = diasCorridosEquivalentes(N, base);
 
   if (regime === 'isento') return {regime, aliq:0, diasIR, label:'Isento (0%)'};
   if (regime === 'manual') {
@@ -374,18 +378,17 @@ function getTaxConfig(meses){
     const aliq = isFinite(a) ? clamp(a,0,0.999) : 0;
     return {regime, aliq, diasIR, label:`Manual (${fmtPct2(aliq)})`};
   }
+
   const aliq = irAliquotaDias(diasIR);
-  return {regime, aliq, diasIR, label:`Regressivo (${fmtPct2(aliq)} em ${diasIR} dias)`};
+  return {regime, aliq, diasIR, label:`Regressivo (${fmtPct2(aliq)} | ${diasIR} dias)`};
 }
 
 /* =====================
    Degraus: calendário -> base
    ===================== */
 function stepEveryInBase(stepEveryCalendar, base){
-  // passo = dias corridos; se base=252, converte (aprox) via 252/365
   if (base === 365) return Math.max(1, Math.round(stepEveryCalendar));
-  const conv = 252/365;
-  return Math.max(1, Math.round(stepEveryCalendar * conv));
+  return Math.max(1, Math.round(stepEveryCalendar * (252/365)));
 }
 function refreshStepHint(){
   const base = getBase();
@@ -505,7 +508,10 @@ function buildCustomPath(N, r0, r1, text){
 
   // forward fill
   let last = rates[0];
-  for (let i=0;i<N;i++){ rates[i] = isFinite(rates[i]) ? rates[i] : last; last = rates[i]; }
+  for (let i=0;i<N;i++){
+    rates[i] = isFinite(rates[i]) ? rates[i] : last;
+    last = rates[i];
+  }
   return rates;
 }
 
@@ -542,7 +548,7 @@ function setupCanvas(canvas){
   canvas.width = Math.round(cssW * dpr);
   canvas.height = Math.round(cssH * dpr);
   const ctx = canvas.getContext('2d');
-  ctx.setTransform(dpr,0,0,dpr,0,0); // draw in CSS pixels
+  ctx.setTransform(dpr,0,0,dpr,0,0);
   return ctx;
 }
 
@@ -563,7 +569,6 @@ function drawLineChart(canvas, seriesA, seriesB, opts){
   scan(seriesA); if (seriesB) scan(seriesB);
   if (ymin===ymax){ ymin-=1; ymax+=1; }
 
-  // background grid
   ctx.strokeStyle = 'rgba(255,255,255,.08)';
   ctx.lineWidth = 1;
 
@@ -579,7 +584,6 @@ function drawLineChart(canvas, seriesA, seriesB, opts){
     ctx.beginPath(); ctx.moveTo(xx,y1); ctx.lineTo(xx,y0); ctx.stroke();
   }
 
-  // axes
   ctx.strokeStyle = 'rgba(255,255,255,.20)';
   ctx.beginPath(); ctx.moveTo(x0,y1); ctx.lineTo(x0,y0); ctx.lineTo(x1,y0); ctx.stroke();
 
@@ -587,7 +591,6 @@ function drawLineChart(canvas, seriesA, seriesB, opts){
   ctx.font = '14px system-ui,-apple-system,Segoe UI,Roboto,Arial';
   ctx.fillStyle = 'rgba(229,231,235,.88)';
 
-  // y labels
   ctx.textAlign = 'right';
   ctx.textBaseline = 'middle';
   for (let i=0;i<=yTicks;i++){
@@ -596,7 +599,6 @@ function drawLineChart(canvas, seriesA, seriesB, opts){
     ctx.fillText(opts.formatY(val), x0-10, yy);
   }
 
-  // x labels
   ctx.textAlign = 'center';
   ctx.textBaseline = 'top';
   for (let i=0;i<=xTicks;i++){
@@ -621,7 +623,6 @@ function drawLineChart(canvas, seriesA, seriesB, opts){
   plot(seriesA, 'rgba(34,197,94,.95)', 2.6);
   if (seriesB) plot(seriesB, 'rgba(245,158,11,.95)', 2.2);
 
-  // title
   if (opts.title){
     ctx.fillStyle = 'rgba(229,231,235,.92)';
     ctx.font = '15px system-ui,-apple-system,Segoe UI,Roboto,Arial';
@@ -630,7 +631,6 @@ function drawLineChart(canvas, seriesA, seriesB, opts){
     ctx.fillText(opts.title, x0, 8);
   }
 
-  // legend
   if (opts.legendA || opts.legendB){
     const yLeg = 34;
     let xLeg = x0;
@@ -692,7 +692,7 @@ function run(){
   const stepSize = Number(el('stepSize').value || 0.5);
   const customText = el('customText').value;
 
-  const taxCfg = getTaxConfig(meses);
+  const taxCfg = getTaxConfig({N, base});
   const ir = taxCfg.aliq;
 
   const ratesAA = buildPath({N,r0,r1,scenario,curv,expo,stepEveryCalendar,stepSize,base,customText});
@@ -721,9 +721,10 @@ function run(){
   el('badgeBase').textContent = `Base: ${base} (${unidadeTxt})`;
   el('badgeHorizonte').textContent = `Prazo: ${meses} meses → ${N} ${unidadeTxt}`;
   el('badgeIR').textContent = `IR: ${taxCfg.label}`;
+
   el('baseSpan').textContent = String(base);
 
-  // KPIs claros (percentual + R$)
+  // KPIs
   el('kEffBruta').textContent = fmtPct2(effBruta);
   el('kEffLiquida').textContent = fmtPct2(effLiquida);
   el('kMontanteBruto').textContent = fmtBRL(montanteBruto);
@@ -749,7 +750,7 @@ function run(){
   });
 
   const xLabelMonths = (idx)=>{
-    const t = (idx/(N-1)) * meses; // 0..meses
+    const t = (idx/(N-1)) * meses;
     return `${t.toLocaleString('pt-BR',{maximumFractionDigits:0})}m`;
   };
 
@@ -757,7 +758,7 @@ function run(){
     title: 'Selic (a.a.)',
     formatY: (v)=> v.toLocaleString('pt-BR',{maximumFractionDigits:2}) + '%',
     formatX: xLabelMonths,
-    xTicks: Math.min(6, Math.max(3, meses/6))
+    xTicks: 6
   });
 
   drawLineChart(el('chartAcc'), accSelicPct, accPrePct, {
@@ -766,10 +767,12 @@ function run(){
     formatX: xLabelMonths,
     legendA: 'Selic (bruto)',
     legendB: 'Pré (bruto)',
-    xTicks: Math.min(6, Math.max(3, meses/6))
+    xTicks: 6
   });
 
-  el('msg').textContent = `Degraus: ${Number(el('stepEveryCalendar').value||45)} dias corridos ≈ ${stepEveryInBase(Number(el('stepEveryCalendar').value||45), base)} na base atual.`;
+  const stepBase = stepEveryInBase(stepEveryCalendar, base);
+  const diasIR = diasCorridosEquivalentes(N, base);
+  el('msg').textContent = `Degraus: ${stepEveryCalendar} dias corridos ≈ ${stepBase} na base atual. IR regressivo: ${diasIR} dias (corridos equivalentes).`;
 }
 
 /* ===== share link ===== */
@@ -780,7 +783,7 @@ function setFromQuery(){
   if (get('preset')) el('prazoPreset').value = get('preset');
   if (get('meses')) el('prazoMeses').value = get('meses');
   if (get('u')) el('unidade').value = get('u');
-  if (get('irconv')) el('diasIRConv').value = get('irconv');
+
   if (get('r0')) el('r0').value = get('r0');
   if (get('r1')) el('r1').value = get('r1');
   if (get('s')) el('cenario').value = get('s');
@@ -789,8 +792,10 @@ function setFromQuery(){
   if (get('stepCal')) el('stepEveryCalendar').value = get('stepCal');
   if (get('stepSize')) el('stepSize').value = get('stepSize');
   if (get('custom')) el('customText').value = decodeURIComponent(get('custom'));
+
   if (get('tax')) el('taxRegime').value = get('tax');
   if (get('aliq')) el('aliqManual').value = get('aliq');
+
   if (get('P')) el('principal').value = get('P');
   if (get('pre')) el('preMarket').value = get('pre');
 
@@ -800,10 +805,10 @@ function setFromQuery(){
 function copyShareLink(){
   const meses = getMeses();
   const q = new URLSearchParams();
+
   q.set('preset', el('prazoPreset').value);
   q.set('meses', String(meses));
   q.set('u', el('unidade').value);
-  q.set('irconv', el('diasIRConv').value);
 
   q.set('r0', el('r0').value);
   q.set('r1', el('r1').value);
@@ -821,7 +826,9 @@ function copyShareLink(){
   q.set('pre', el('preMarket').value);
 
   const url = `${location.origin}${location.pathname}?${q.toString()}`;
-  navigator.clipboard.writeText(url).then(()=> el('msg').textContent='Link copiado.').catch(()=> el('msg').textContent='Não consegui copiar automaticamente.');
+  navigator.clipboard.writeText(url)
+    .then(()=> el('msg').textContent='Link copiado.')
+    .catch(()=> el('msg').textContent='Não consegui copiar automaticamente.');
 }
 
 /* listeners */
@@ -831,7 +838,15 @@ function copyShareLink(){
   el('unidade').addEventListener(evt, ()=>{ updateVisibility(); run(); });
   el('cenario').addEventListener(evt, ()=>{ updateVisibility(); run(); });
   el('taxRegime').addEventListener(evt, ()=>{ updateVisibility(); run(); });
+  el('aliqManual').addEventListener(evt, ()=>{ updateVisibility(); run(); });
   el('stepEveryCalendar').addEventListener(evt, ()=>{ updateVisibility(); run(); });
+  el('stepSize').addEventListener(evt, ()=>{ updateVisibility(); run(); });
+  el('curv').addEventListener(evt, ()=>{ updateVisibility(); run(); });
+  el('expo').addEventListener(evt, ()=>{ updateVisibility(); run(); });
+  el('r0').addEventListener(evt, ()=> run());
+  el('r1').addEventListener(evt, ()=> run());
+  el('principal').addEventListener(evt, ()=> run());
+  el('preMarket').addEventListener(evt, ()=> run());
 });
 el('btnCalc').addEventListener('click', run);
 el('btnShare').addEventListener('click', copyShareLink);
